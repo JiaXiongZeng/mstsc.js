@@ -25,6 +25,7 @@ var rdp = require('node-rdpjs');
  */
 module.exports = function (server) {
 	var io = require('socket.io')(server);
+	io.origins('*:*');
 	io.on('connection', function(client) {
 		var rdpClient = null;
 		client.on('infos', function (infos) {

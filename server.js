@@ -19,12 +19,41 @@
 
 var express = require('express');
 var http = require('http');
+var engine = require('ejs-locals');
 
 var app = express();
-app.use(express.static(__dirname + '/client'))
-app.get('/', function(req, res) {
-	res.sendFile(__dirname + '/client/html/index.html');
+
+app.engine('ejs', engine);
+app.set("views", __dirname + "/server/views");
+app.set("view engine", "ejs");
+
+app.use(express.json({ extended: true }));       // to support JSON-encoded bodies
+app.use(express.urlencoded({ extended: true })); // to support URL-encoded bodies
+
+app.use(express.static(__dirname + '/client'));
+
+app.get('/', function(req, res) {	
+	res.render("index", { 
+		"fields": {
+			ip: req.query.ip,
+			domain: req.query.domain,
+			userName: req.query.userName,
+			password: req.query.password
+		}
+	});
 });
+
+app.post('/', function (req, res) {
+	res.render("index", {
+		"fields": {
+			ip: req.body.ip,
+			domain: req.body.domain,
+			userName: req.body.userName,
+			password: req.body.password
+		}
+	});
+});
+
 var server = http.createServer(app).listen(process.env.PORT || 9250);
 
 require('./server/mstsc')(server);
